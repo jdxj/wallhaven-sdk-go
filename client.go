@@ -3,9 +3,10 @@ package wallhaven_sdk_go
 import (
 	"context"
 	"io"
+	"log"
 	"net/http"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-resty/resty/v2"
 )
 
 const (
@@ -38,15 +39,38 @@ func NewClient(optFs ...SetOption) *Client {
 		f(opt)
 	}
 
-	return &Client{
+	c := &Client{
 		opt: opt,
-		hc:  &http.Client{},
+		rc:  resty.New(),
 	}
+
+	if c.opt.debug {
+		c.rc.
+			OnBeforeRequest(func(client *resty.Client, request *resty.Request) error {
+				log.Printf("url: %s\n", request.URL)
+				return nil
+			})
+	}
+	return c
 }
 
 type Client struct {
 	opt *option
-	hc  *http.Client
+	rc  *resty.Client
+}
+
+func (c *Client) r(ctx context.Context) *resty.Request {
+	r := c.rc.R()
+	r.SetContext(ctx)
+	r.SetHeader("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36")
+
+	if c.opt.apiKey != "" {
+		r.SetQueryParam("apikey", c.opt.apiKey)
+	}
+	if c.opt.debug {
+		r.EnableTrace()
+	}
+	return r
 }
 
 func WithMethod(method string) SetDoOpt {
@@ -61,9 +85,10 @@ func WithURL(url string) SetDoOpt {
 	}
 }
 
+// todo: set file, multipart file
 func WithBody(body io.Reader) SetDoOpt {
 	return func(opt *doOpt) {
-		opt.body = body
+		//opt.body = body
 	}
 }
 
@@ -97,47 +122,9 @@ func newDoOpt() *doOpt {
 type doOpt struct {
 	method string
 	url    string
-	body   io.Reader
 
 	query  map[string]string
 	header map[string]string
 
 	parser Parser
-}
-
-func (c *Client) Do(ctx context.Context, doOptFs ...SetDoOpt) error {
-	doOpt := newDoOpt()
-	for _, f := range doOptFs {
-		f(doOpt)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, doOpt.method, doOpt.url, doOpt.body)
-	if err != nil {
-		return err
-	}
-
-	query := req.URL.Query()
-	for key, value := range doOpt.query {
-		query.Add(key, value)
-	}
-	req.URL.RawQuery = query.Encode()
-
-	for key, value := range doOpt.header {
-		req.Header.Add(key, value)
-	}
-
-	rsp, err := c.hc.Do(req)
-	if err != nil {
-		return err
-	}
-	defer rsp.Body.Close()
-
-	if doOpt.parser == nil {
-		return nil
-	}
-	return doOpt.parser.Parse(req)
-}
-
-func sToStruct() {
-	mapstructure.Decode(nil, nil)
 }

@@ -2,36 +2,28 @@ package wallhaven_sdk_go
 
 import (
 	"context"
-	"net/http"
+	"fmt"
+	"os"
 	"testing"
-
-	"github.com/mitchellh/mapstructure"
 )
 
-func TestNewReq(t *testing.T) {
-	rsp, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "", nil)
+var (
+	client *Client
+)
+
+func TestMain(t *testing.M) {
+	client = NewClient(WithDebug(true))
+	os.Exit(t.Run())
+}
+
+func TestClient_GetWallpaper(t *testing.T) {
+	req := &GetWallpaperReq{
+		ID: "k7v9yq",
+	}
+
+	rsp, err := client.GetWallpaper(context.Background(), req)
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
-	if rsp.URL != nil {
-		t.Logf("url ok")
-	}
-}
-
-type Person struct {
-	Name        string `mapstructure:"name"`
-	FirstSecond string `mapstructure:"f_s"`
-}
-
-func TestMapStruct(t *testing.T) {
-	p := Person{
-		Name:        "abc",
-		FirstSecond: "def",
-	}
-	var c map[string]string
-	err := mapstructure.Decode(p, &c)
-	if err != nil {
-		t.Fatalf("%s\n", err)
-	}
-	t.Logf("%v\n", c)
+	fmt.Printf("%+v\n", rsp)
 }
