@@ -67,7 +67,7 @@ type Query struct {
 }
 
 func (q Query) String() string {
-
+	return ""
 }
 
 func (q Query) FuzzilyTags(tags ...string) {

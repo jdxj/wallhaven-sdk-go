@@ -17,11 +17,11 @@ func TestMain(t *testing.M) {
 }
 
 func TestClient_GetWallpaper(t *testing.T) {
-	req := &GetWallpaperReq{
+	req := &GetWallpaperInfoReq{
 		ID: "k7v9yq",
 	}
 
-	rsp, err := client.GetWallpaper(context.Background(), req)
+	rsp, err := client.GetWallpaperInfo(context.Background(), req)
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
@@ -90,4 +90,15 @@ func TestCategory_String(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestClient_GetTagInfo(t *testing.T) {
+	req := &GetTagInfoReq{
+		ID: 372,
+	}
+	rsp, err := client.GetTagInfo(context.Background(), req)
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("%+v\n", rsp)
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type GetWallpaperReq struct {
+type GetWallpaperInfoReq struct {
 	ID string `mapstructure:"id"`
 }
 
@@ -30,7 +30,7 @@ type Tag struct {
 	CreatedAt  string `json:"created_at"`
 }
 
-type GetWallpaperRsp struct {
+type GetWallpaperInfoRsp struct {
 	Id         string   `json:"id"`
 	Url        string   `json:"url"`
 	ShortUrl   string   `json:"short_url"`
@@ -53,10 +53,10 @@ type GetWallpaperRsp struct {
 	Tags       []Tag    `json:"tags"`
 }
 
-func (c *Client) GetWallpaper(ctx context.Context, req *GetWallpaperReq) (*GetWallpaperRsp, error) {
+func (c *Client) GetWallpaperInfo(ctx context.Context, req *GetWallpaperInfoReq) (*GetWallpaperInfoRsp, error) {
 	var (
 		url  = baseURL + version + "/w/{id}"
-		wrap = newRsp(&GetWallpaperRsp{})
+		wrap = newRsp(&GetWallpaperInfoRsp{})
 	)
 	rsp, err := c.r(ctx).
 		SetPathParams(structToMap(req)).
@@ -65,5 +65,5 @@ func (c *Client) GetWallpaper(ctx context.Context, req *GetWallpaperReq) (*GetWa
 	if err != nil {
 		return nil, err
 	}
-	return rsp.Result().(*response).Data.(*GetWallpaperRsp), nil
+	return rsp.Result().(*response).Data.(*GetWallpaperInfoRsp), nil
 }
