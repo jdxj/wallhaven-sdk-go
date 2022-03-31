@@ -12,5 +12,10 @@ func structToMap(s interface{}) map[string]string {
 	if err != nil {
 		log.Printf("structToMap: %s", err)
 	}
+	for k, v := range m {
+		if v == "" {
+			delete(m, k)
+		}
+	}
 	return m
 }
