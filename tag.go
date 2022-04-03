@@ -2,13 +2,24 @@ package wallhaven_sdk_go
 
 import (
 	"context"
+	"strconv"
 )
 
-type GetTagInfoReq struct {
-	ID int `mapstructure:"id"`
+type GetTagReq struct {
+	ID int
 }
 
-type GetTagInfoRsp struct {
+func (gti *GetTagReq) API() string {
+	return baseURL + version + "/tag/{id}"
+}
+
+func (gti *GetTagReq) Map() map[string]string {
+	return map[string]string{
+		"id": strconv.Itoa(gti.ID),
+	}
+}
+
+type Tag struct {
 	Id         int    `json:"id"`
 	Name       string `json:"name"`
 	Alias      string `json:"alias"`
@@ -18,17 +29,14 @@ type GetTagInfoRsp struct {
 	CreatedAt  string `json:"created_at"`
 }
 
-func (c *Client) GetTagInfo(ctx context.Context, req *GetTagInfoReq) (*GetTagInfoRsp, error) {
-	var (
-		url  = baseURL + version + "/tag/{id}"
-		wrap = newRsp(&GetTagInfoRsp{})
-	)
+func (c *Client) GetTag(ctx context.Context, req *GetTagReq) (*Tag, error) {
+	wrap := newRsp(&Tag{})
 	rsp, err := c.r(ctx).
-		SetPathParams(structToMap(req)).
+		SetPathParams(req.Map()).
 		SetResult(wrap).
-		Get(url)
+		Get(req.API())
 	if err != nil {
 		return nil, err
 	}
-	return rsp.Result().(*response).Data.(*GetTagInfoRsp), nil
+	return rsp.Result().(*response).Data.(*Tag), nil
 }

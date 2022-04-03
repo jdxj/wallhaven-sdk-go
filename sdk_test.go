@@ -17,11 +17,11 @@ func TestMain(t *testing.M) {
 }
 
 func TestClient_GetWallpaper(t *testing.T) {
-	req := &GetWallpaperInfoReq{
+	req := &GetWallpaperReq{
 		ID: "k7v9yq",
 	}
 
-	rsp, err := client.GetWallpaperInfo(context.Background(), req)
+	rsp, err := client.GetWallpaper(context.Background(), req)
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
@@ -30,14 +30,6 @@ func TestClient_GetWallpaper(t *testing.T) {
 
 type Person struct {
 	Age int `mapstructure:"age"`
-}
-
-func TestStructToMap(t *testing.T) {
-	p := &Person{
-		Age: 10,
-	}
-	m := structToMap(p)
-	fmt.Printf("%v\n", m)
 }
 
 func TestCategory_String(t *testing.T) {
@@ -93,10 +85,33 @@ func TestCategory_String(t *testing.T) {
 }
 
 func TestClient_GetTagInfo(t *testing.T) {
-	req := &GetTagInfoReq{
+	req := &GetTagReq{
 		ID: 372,
 	}
-	rsp, err := client.GetTagInfo(context.Background(), req)
+	rsp, err := client.GetTag(context.Background(), req)
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("%+v\n", rsp)
+}
+
+func TestClient_GetCollections(t *testing.T) {
+	rsp, err := client.GetCollections(context.Background(), &GetCollectionsReq{
+		Username: "jdxj",
+	})
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	for _, v := range rsp.Collections {
+		fmt.Printf("%+v\n", v)
+	}
+}
+
+func TestClient_GetCollectionWallpapers(t *testing.T) {
+	rsp, err := client.GetCollectionWallpapers(context.Background(), &GetCollectionWallpapersReq{
+		Username: "jdxj",
+		ID:       1151634,
+	})
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}

@@ -4,8 +4,18 @@ import (
 	"context"
 )
 
-type GetWallpaperInfoReq struct {
-	ID string `mapstructure:"id"`
+type GetWallpaperReq struct {
+	ID string
+}
+
+func (gwr *GetWallpaperReq) API() string {
+	return baseURL + version + "/w/{id}"
+}
+
+func (gwr *GetWallpaperReq) Map() map[string]string {
+	return map[string]string{
+		"id": gwr.ID,
+	}
 }
 
 type Uploader struct {
@@ -20,17 +30,7 @@ type Thumbs struct {
 	Small    string `json:"small"`
 }
 
-type Tag struct {
-	Id         int    `json:"id"`
-	Name       string `json:"name"`
-	Alias      string `json:"alias"`
-	CategoryId int    `json:"category_id"`
-	Category   string `json:"category"`
-	Purity     string `json:"purity"`
-	CreatedAt  string `json:"created_at"`
-}
-
-type GetWallpaperInfoRsp struct {
+type Wallpaper struct {
 	Id         string   `json:"id"`
 	Url        string   `json:"url"`
 	ShortUrl   string   `json:"short_url"`
@@ -53,17 +53,14 @@ type GetWallpaperInfoRsp struct {
 	Tags       []Tag    `json:"tags"`
 }
 
-func (c *Client) GetWallpaperInfo(ctx context.Context, req *GetWallpaperInfoReq) (*GetWallpaperInfoRsp, error) {
-	var (
-		url  = baseURL + version + "/w/{id}"
-		wrap = newRsp(&GetWallpaperInfoRsp{})
-	)
+func (c *Client) GetWallpaper(ctx context.Context, req *GetWallpaperReq) (*Wallpaper, error) {
+	wrap := newRsp(&Wallpaper{})
 	rsp, err := c.r(ctx).
-		SetPathParams(structToMap(req)).
+		SetPathParams(req.Map()).
 		SetResult(wrap).
-		Get(url)
+		Get(req.API())
 	if err != nil {
 		return nil, err
 	}
-	return rsp.Result().(*response).Data.(*GetWallpaperInfoRsp), nil
+	return rsp.Result().(*response).Data.(*Wallpaper), nil
 }
