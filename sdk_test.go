@@ -117,3 +117,11 @@ func TestClient_GetCollectionWallpapers(t *testing.T) {
 	}
 	fmt.Printf("%+v\n", rsp)
 }
+
+func TestClient_GetSettings(t *testing.T) {
+	rsp, err := client.GetSettings(context.Background())
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("%+v\n", rsp)
+}

@@ -2,6 +2,7 @@ package wallhaven_sdk_go
 
 import (
 	"context"
+	"errors"
 	"strconv"
 )
 
@@ -38,5 +39,9 @@ func (c *Client) GetTag(ctx context.Context, req *GetTagReq) (*Tag, error) {
 	if err != nil {
 		return nil, err
 	}
+	if rsp.IsError() {
+		return nil, errors.New(rsp.Status())
+	}
+
 	return rsp.Result().(*response).Data.(*Tag), nil
 }

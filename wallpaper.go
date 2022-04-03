@@ -2,6 +2,7 @@ package wallhaven_sdk_go
 
 import (
 	"context"
+	"errors"
 )
 
 type GetWallpaperReq struct {
@@ -62,5 +63,9 @@ func (c *Client) GetWallpaper(ctx context.Context, req *GetWallpaperReq) (*Wallp
 	if err != nil {
 		return nil, err
 	}
+	if rsp.IsError() {
+		return nil, errors.New(rsp.Status())
+	}
+
 	return rsp.Result().(*response).Data.(*Wallpaper), nil
 }

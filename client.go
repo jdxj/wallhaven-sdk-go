@@ -2,6 +2,7 @@ package wallhaven_sdk_go
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -46,8 +47,13 @@ func NewClient(optFs ...SetOption) *Client {
 
 	if c.opt.debug {
 		c.rc.
+			EnableTrace().
 			OnBeforeRequest(func(client *resty.Client, request *resty.Request) error {
 				log.Printf("url: %s\n", request.URL)
+				return nil
+			}).
+			OnAfterResponse(func(client *resty.Client, r *resty.Response) error {
+				fmt.Printf("body: %s\n", r.Body())
 				return nil
 			})
 	}

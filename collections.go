@@ -2,6 +2,7 @@ package wallhaven_sdk_go
 
 import (
 	"context"
+	"errors"
 	"strconv"
 )
 
@@ -43,6 +44,10 @@ func (c *Client) GetCollections(ctx context.Context, req *GetCollectionsReq) (*G
 	if err != nil {
 		return nil, err
 	}
+	if rsp.IsError() {
+		return nil, errors.New(rsp.Status())
+	}
+
 	return rsp.Result().(*GetCollectionsRsp), nil
 }
 
@@ -77,5 +82,9 @@ func (c *Client) GetCollectionWallpapers(ctx context.Context, req *GetCollection
 	if err != nil {
 		return nil, err
 	}
+	if rsp.IsError() {
+		return nil, errors.New(rsp.Status())
+	}
+
 	return rsp.Result().(*GetCollectionWallpapersRsp), nil
 }
