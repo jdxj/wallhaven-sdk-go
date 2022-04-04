@@ -53,6 +53,7 @@ func NewClient(optFs ...SetOption) *Client {
 				return nil
 			}).
 			OnAfterResponse(func(client *resty.Client, r *resty.Response) error {
+				log.Printf("raw url: %s\n", r.Request.RawRequest.URL.RequestURI())
 				fmt.Printf("body: %s\n", r.Body())
 				return nil
 			})

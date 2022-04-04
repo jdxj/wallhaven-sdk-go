@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -26,10 +28,6 @@ func TestClient_GetWallpaper(t *testing.T) {
 		t.Fatalf("%s\n", err)
 	}
 	fmt.Printf("%+v\n", rsp)
-}
-
-type Person struct {
-	Age int `mapstructure:"age"`
 }
 
 func TestCategory_String(t *testing.T) {
@@ -124,4 +122,78 @@ func TestClient_GetSettings(t *testing.T) {
 		t.Fatalf("%s\n", err)
 	}
 	fmt.Printf("%+v\n", rsp)
+}
+
+func TestResolutions_Map(t *testing.T) {
+	r := &Resolutions{}
+	r.SetAtLeast(R_1280x720).
+		SetExact(R_1600x1000).
+		SetCustom(123, 456)
+	res := r.Map()
+	fmt.Printf("%v\n", res)
+}
+
+func TestJoin(t *testing.T) {
+	ss := []string{""}
+	res := strings.Join(ss, "-")
+	fmt.Printf("res: %s\n", res)
+}
+
+func TestQuery_String(t *testing.T) {
+	q := &Query{
+		fuzzy:    []string{},
+		exclude:  []string{"people", "apple"},
+		must:     []string{},
+		exact:    123,
+		username: "king",
+		typ:      PNG,
+		like:     "fff",
+	}
+	fmt.Printf("%s\n", q)
+}
+
+func TestConvert(t *testing.T) {
+	var n rune = 48
+	n = n + 2
+	fmt.Printf("%s", string(n))
+}
+
+func TestCategory_String2(t *testing.T) {
+	cate := People | Anime
+	fmt.Printf("%s\n", cate)
+}
+
+func TestString(t *testing.T) {
+	ss := "abc"
+	for _, v := range ss {
+		fmt.Printf("%d\n", v)
+		t := reflect.TypeOf(v)
+		fmt.Printf("%s\n", t)
+	}
+
+	rs := []int32{48, 49}
+	fmt.Printf("%s\n", string(rs))
+}
+
+func TestClient_Search(t *testing.T) {
+	r := &SearchReq{
+		Query: Query{
+			fuzzy:    []string{},
+			exclude:  []string{},
+			must:     []string{"apple", "people"},
+			exact:    0,
+			username: "",
+			typ:      "",
+			like:     "",
+		},
+	}
+	fmt.Printf("req: %v\n", r.Map())
+	rsp, err := client.Search(context.Background(), r)
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	for _, v := range rsp.Wallpapers {
+		fmt.Printf("%+v\n", v)
+	}
+	fmt.Printf("meta: %+v\n", rsp.Meta)
 }
