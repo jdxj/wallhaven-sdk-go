@@ -2,10 +2,8 @@ package wallhaven_sdk_go
 
 import (
 	"context"
-	"fmt"
-	"io"
+	"errors"
 	"log"
-	"net/http"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -13,6 +11,10 @@ import (
 const (
 	baseURL = "https://wallhaven.cc/api"
 	version = "/v1"
+)
+
+var (
+	ErrUnknown = errors.New("unknown err")
 )
 
 func WithDebug(debug bool) SetOption {
@@ -54,7 +56,7 @@ func NewClient(optFs ...SetOption) *Client {
 			}).
 			OnAfterResponse(func(client *resty.Client, r *resty.Response) error {
 				log.Printf("raw url: %s\n", r.Request.RawRequest.URL.RequestURI())
-				fmt.Printf("body: %s\n", r.Body())
+				log.Printf("body: %s\n", r.Body())
 				return nil
 			})
 	}
@@ -78,60 +80,4 @@ func (c *Client) r(ctx context.Context) *resty.Request {
 		r.EnableTrace()
 	}
 	return r
-}
-
-func WithMethod(method string) SetDoOpt {
-	return func(opt *doOpt) {
-		opt.method = method
-	}
-}
-
-func WithURL(url string) SetDoOpt {
-	return func(opt *doOpt) {
-		opt.url = url
-	}
-}
-
-// todo: set file, multipart file
-func WithBody(body io.Reader) SetDoOpt {
-	return func(opt *doOpt) {
-		//opt.body = body
-	}
-}
-
-func WithQuery(query map[string]string) SetDoOpt {
-	return func(opt *doOpt) {
-		opt.query = query
-	}
-}
-
-func WithHeader(header map[string]string) SetDoOpt {
-	return func(opt *doOpt) {
-		opt.header = header
-	}
-}
-
-func WithParser(parser Parser) SetDoOpt {
-	return func(opt *doOpt) {
-		opt.parser = parser
-	}
-}
-
-type SetDoOpt func(*doOpt)
-
-func newDoOpt() *doOpt {
-	do := &doOpt{
-		method: http.MethodGet,
-	}
-	return do
-}
-
-type doOpt struct {
-	method string
-	url    string
-
-	query  map[string]string
-	header map[string]string
-
-	parser Parser
 }

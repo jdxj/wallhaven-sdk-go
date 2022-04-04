@@ -2,7 +2,6 @@ package wallhaven_sdk_go
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -12,34 +11,34 @@ type Color = string
 
 const (
 	C_660000 Color = "660000"
-	C_990000       = "990000"
-	C_cc0000       = "cc0000"
-	C_cc3333       = "cc3333"
-	C_ea4c88       = "ea4c88"
-	C_993399       = "993399"
-	C_663399       = "663399"
-	C_333399       = "333399"
-	C_0066cc       = "0066cc"
-	C_0099cc       = "0099cc"
-	C_66cccc       = "66cccc"
-	C_77cc33       = "77cc33"
-	C_669900       = "669900"
-	C_336600       = "336600"
-	C_666600       = "666600"
-	C_999900       = "999900"
-	C_cccc33       = "cccc33"
-	C_ffff00       = "ffff00"
-	C_ffcc33       = "ffcc33"
-	C_ff9900       = "ff9900"
-	C_ff6600       = "ff6600"
-	C_cc6633       = "cc6633"
-	C_996633       = "996633"
-	C_663300       = "663300"
-	C_000000       = "000000"
-	C_999999       = "999999"
-	C_cccccc       = "cccccc"
-	C_ffffff       = "ffffff"
-	C_424153       = "424153"
+	C_990000 Color = "990000"
+	C_cc0000 Color = "cc0000"
+	C_cc3333 Color = "cc3333"
+	C_ea4c88 Color = "ea4c88"
+	C_993399 Color = "993399"
+	C_663399 Color = "663399"
+	C_333399 Color = "333399"
+	C_0066cc Color = "0066cc"
+	C_0099cc Color = "0099cc"
+	C_66cccc Color = "66cccc"
+	C_77cc33 Color = "77cc33"
+	C_669900 Color = "669900"
+	C_336600 Color = "336600"
+	C_666600 Color = "666600"
+	C_999900 Color = "999900"
+	C_cccc33 Color = "cccc33"
+	C_ffff00 Color = "ffff00"
+	C_ffcc33 Color = "ffcc33"
+	C_ff9900 Color = "ff9900"
+	C_ff6600 Color = "ff6600"
+	C_cc6633 Color = "cc6633"
+	C_996633 Color = "996633"
+	C_663300 Color = "663300"
+	C_000000 Color = "000000"
+	C_999999 Color = "999999"
+	C_cccccc Color = "cccccc"
+	C_ffffff Color = "ffffff"
+	C_424153 Color = "424153"
 )
 
 type Category int32
@@ -88,30 +87,30 @@ type Sorting = string
 
 const (
 	DateAdded Sorting = "date_added"
-	Relevance         = "relevance"
-	Random            = "random"
-	Views             = "views"
-	Favorites         = "favorites"
-	TopList           = "toplist"
+	Relevance Sorting = "relevance"
+	Random    Sorting = "random"
+	Views     Sorting = "views"
+	Favorites Sorting = "favorites"
+	TopList   Sorting = "toplist"
 )
 
 type Order = string
 
 const (
 	Desc Order = "desc"
-	Asc        = "asc"
+	Asc  Order = "asc"
 )
 
 type TopRange = string
 
 const (
 	D1 TopRange = "1d"
-	D3          = "3d"
-	W1          = "1w"
-	M1          = "1M"
-	M3          = "3M"
-	M6          = "6M"
-	Y1          = "1y"
+	D3 TopRange = "3d"
+	W1 TopRange = "1w"
+	M1 TopRange = "1M"
+	M3 TopRange = "3M"
+	M6 TopRange = "6M"
+	Y1 TopRange = "1y"
 )
 
 type Resolution = string
@@ -119,8 +118,8 @@ type Resolution = string
 const (
 	// Ultrawide
 	R_2560x1080 Resolution = "2560x1080"
-	R_3440x1440            = "3440x1440"
-	R_3840x1600            = "3840x1600"
+	R_3440x1440 Resolution = "3440x1440"
+	R_3840x1600 Resolution = "3840x1600"
 
 	// 16:9
 	R_1280x720  = "1280x720"
@@ -198,27 +197,27 @@ type Ratio = string
 
 const (
 	Landscape Ratio = "landscape"
-	Portrait        = "portrait"
+	Portrait  Ratio = "portrait"
 
 	// Wide
-	O_16x9  = "16x9"
-	O_16x10 = "16x10"
+	O_16x9  Ratio = "16x9"
+	O_16x10 Ratio = "16x10"
 
 	// Ultrawide
-	O_21x9 = "21x9"
-	O_32x9 = "32x9"
-	O_48x9 = "48x9"
+	O_21x9 Ratio = "21x9"
+	O_32x9 Ratio = "32x9"
+	O_48x9 Ratio = "48x9"
 
 	// Portrait
-	O_9x16  = "9x16"
-	O_10x16 = "10x16"
-	O_9x18  = "9x18"
+	O_9x16  Ratio = "9x16"
+	O_10x16 Ratio = "10x16"
+	O_9x18  Ratio = "9x18"
 
 	// Square
-	O_1x1 = "1x1"
-	O_3x2 = "3x2"
-	O_4x3 = "4x3"
-	O_5x4 = "5x4"
+	O_1x1 Ratio = "1x1"
+	O_3x2 Ratio = "3x2"
+	O_4x3 Ratio = "4x3"
+	O_5x4 Ratio = "5x4"
 )
 
 type Ratios struct {
@@ -238,7 +237,7 @@ type Type = string
 
 const (
 	PNG Type = "png"
-	JPG      = "jpg"
+	JPG Type = "jpg"
 )
 
 type Query struct {
@@ -380,7 +379,7 @@ func (c *Client) Search(ctx context.Context, req *SearchReq) (*SearchRsp, error)
 		return nil, err
 	}
 	if rsp.IsError() {
-		return nil, errors.New(rsp.Status())
+		return nil, fmt.Errorf("%w: %s", ErrUnknown, rsp.Status())
 	}
 
 	return rsp.Result().(*SearchRsp), nil

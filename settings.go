@@ -2,7 +2,7 @@ package wallhaven_sdk_go
 
 import (
 	"context"
-	"errors"
+	"fmt"
 )
 
 type GetSettingsRsp struct {
@@ -27,7 +27,7 @@ func (c *Client) GetSettings(ctx context.Context) (*GetSettingsRsp, error) {
 		return nil, err
 	}
 	if rsp.IsError() {
-		return nil, errors.New(rsp.Status())
+		return nil, fmt.Errorf("%w: %s", ErrUnknown, rsp.Status())
 	}
 
 	return rsp.Result().(*response).Data.(*GetSettingsRsp), nil
