@@ -3,10 +3,12 @@ package wallhaven_sdk_go
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"os"
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
 
 var (
@@ -176,16 +178,14 @@ func TestString(t *testing.T) {
 }
 
 func TestClient_Search(t *testing.T) {
+	rand.Seed(time.Now().UnixNano())
 	r := &SearchReq{
-		Query: Query{
-			fuzzy:    []string{},
-			exclude:  []string{},
-			must:     []string{"apple", "people"},
-			exact:    0,
-			username: "",
-			typ:      "",
-			like:     "",
-		},
+		Category: People | Anime | General,
+		Purity:   SFW,
+		Sorting:  TopList,
+		Order:    Desc,
+		TopRange: M1,
+		Page:     1,
 	}
 	fmt.Printf("req: %v\n", r.Map())
 	rsp, err := client.Search(context.Background(), r)
@@ -196,4 +196,49 @@ func TestClient_Search(t *testing.T) {
 		fmt.Printf("%+v\n", v)
 	}
 	fmt.Printf("meta: %+v\n", rsp.Meta)
+
+	fmt.Printf("--------------\n")
+
+	randTotal := rand.Intn(rsp.Meta.Total) + 1
+
+	r = &SearchReq{
+		Category: People | Anime | General,
+		Purity:   SFW,
+		Sorting:  TopList,
+		Order:    Desc,
+		TopRange: M1,
+		Page:     randTotal/24 + 1,
+	}
+	rsp, err = client.Search(context.Background(), r)
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("a wallpaper: %+v\n", rsp.Wallpapers[randTotal%24-1])
+	fmt.Printf("meta: %+v\n", rsp.Meta)
+	fmt.Printf("======================\n")
+
+	randTotal = rand.Intn(rsp.Meta.Total) + 1
+
+	r = &SearchReq{
+		Category: People | Anime | General,
+		Purity:   SFW,
+		Sorting:  TopList,
+		Order:    Desc,
+		TopRange: M1,
+		Page:     randTotal/24 + 1,
+	}
+	rsp, err = client.Search(context.Background(), r)
+	if err != nil {
+		t.Fatalf("%s\n", err)
+	}
+	fmt.Printf("a wallpaper: %+v\n", rsp.Wallpapers[randTotal%24-1])
+	fmt.Printf("meta: %+v\n", rsp.Meta)
 }
+
+/*
+	页数和个数的关系
+	(pageID - 1) * pageSize + (index + 1) = x
+
+	x / pageSize = pageID - 1
+	x % pageSize = index + 1
+*/
