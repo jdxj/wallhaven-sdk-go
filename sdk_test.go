@@ -236,9 +236,8 @@ func TestClient_Search(t *testing.T) {
 }
 
 /*
-	页数和个数的关系
-	(pageID - 1) * pageSize + (index + 1) = x
-
-	x / pageSize = pageID - 1
-	x % pageSize = index + 1
+	页数和总偏移的关系
+	(pageID - 1) * pageSize + index = x
+	pageID =( x - x%pageSize + pageSize)/ pageSize
+	index = x%pageSize
 */
