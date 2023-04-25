@@ -62,6 +62,16 @@ func (c Category) String() string {
 	return res
 }
 
+type AIArt bool
+
+func (a AIArt) String() string {
+	if a {
+		return "0"
+	} else {
+		return "1"
+	}
+}
+
 type Purity int32
 
 const (
@@ -92,6 +102,7 @@ const (
 	Views     Sorting = "views"
 	Favorites Sorting = "favorites"
 	TopList   Sorting = "toplist"
+	Hot       Sorting = "hot"
 )
 
 type Order = string
@@ -241,88 +252,85 @@ const (
 )
 
 type Query struct {
-	fuzzy   []string
+	// search fuzzily for a tag/keyword
+	fuzzy []string
+	// exclude a tag/keyword
 	exclude []string
-	must    []string
-	// tag id
-	exact    int
+	// must have tag
+	must []string
+	// user uploads
 	username string
-	typ      Type
-	// wallpaper id
+	// exact tag search (can not be combined)
+	exact string
+	// search for file type (jpg = jpeg)
+	typ Type
+	// find wallpapers with similar tags
 	like string
 }
 
-func (q *Query) String() (value string) {
+func (q *Query) AddFuzzy(tag string) {
+	q.fuzzy = append(q.fuzzy, TrimSpaceAndSplit(tag)...)
+}
+
+func (q *Query) AddExclude(tag string) {
+	for _, v := range TrimSpaceAndSplit(tag) {
+		q.exclude = append(q.exclude, "-"+v)
+	}
+}
+
+func (q *Query) AddMust(tag string) {
+	for _, v := range TrimSpaceAndSplit(tag) {
+		q.must = append(q.must, "+"+v)
+	}
+}
+
+func (q *Query) SetUsername(username string) {
+	q.username = "@" + strings.TrimSpace(username)
+}
+
+func (q *Query) SetExact(tag int) {
+	q.exact = "id:" + strconv.Itoa(tag)
+}
+
+func (q *Query) SetType(typ Type) {
+	q.typ = "type:" + strings.TrimSpace(typ)
+}
+
+func (q *Query) SetLike(like string) {
+	q.like = "like:" + strings.TrimSpace(like)
+}
+
+func (q *Query) String() (result string) {
 	var s []string
 	if len(q.fuzzy) != 0 {
-		v := strings.Join(q.fuzzy, " ")
-		s = append(s, v)
+		s = append(s, strings.Join(q.fuzzy, " "))
 	}
 	if len(q.exclude) != 0 {
-		v := "-" + strings.Join(q.exclude, "-")
-		s = append(s, v)
+		s = append(s, strings.Join(q.exclude, " "))
 	}
 	if len(q.must) != 0 {
-		v := "+" + strings.Join(q.must, "+")
-		s = append(s, v)
-	}
-	if q.exact != 0 {
-		s = append(s, "id:"+strconv.Itoa(q.exact))
+		s = append(s, strings.Join(q.must, " "))
 	}
 	if q.username != "" {
-		s = append(s, "@"+q.username)
+		s = append(s, q.username)
+	}
+	if q.exact != "" {
+		s = append(s, q.exact)
 	}
 	if q.typ != "" {
-		s = append(s, "type:"+q.typ)
+		s = append(s, q.typ)
 	}
 	if q.like != "" {
-		s = append(s, "like:"+q.like)
+		s = append(s, q.like)
 	}
-
-	if len(s) != 0 {
-		value = strings.Join(s, " ")
-	}
+	result = strings.Join(s, " ")
 	return
-}
-
-func (q *Query) SetFuzzilyTags(tags ...string) *Query {
-	q.fuzzy = append(q.fuzzy, tags...)
-	return q
-}
-
-func (q *Query) AddExcludeTags(tags ...string) *Query {
-	q.exclude = append(q.exclude, tags...)
-	return q
-}
-
-func (q *Query) AddMustTags(tags ...string) *Query {
-	q.must = append(q.must, tags...)
-	return q
-}
-
-func (q *Query) SetExactTags(tag int) *Query {
-	q.exact = tag
-	return q
-}
-
-func (q *Query) SetUsername(name string) *Query {
-	q.username = name
-	return q
-}
-
-func (q *Query) SetType(typ Type) *Query {
-	q.typ = typ
-	return q
-}
-
-func (q *Query) SetLike(id string) *Query {
-	q.like = id
-	return q
 }
 
 type SearchReq struct {
 	Query
 	Category
+	AIArt
 	Purity
 	Sorting
 	Order
@@ -341,21 +349,24 @@ func (sr *SearchReq) API() string {
 
 func (sr *SearchReq) Map() map[string]string {
 	m := make(map[string]string)
+
 	m["q"] = sr.Query.String()
 	m["categories"] = sr.Category.String()
+	m["ai_art_filter"] = sr.AIArt.String()
 	m["purity"] = sr.Purity.String()
 	m["sorting"] = sr.Sorting
 	m["order"] = sr.Order
 	m["topRange"] = sr.TopRange
+	m["ratios"] = sr.Ratios.String()
+	m["colors"] = sr.Color
+	m["seed"] = sr.Seed
+
 	for k, v := range sr.Resolutions.Map() {
 		m[k] = v
 	}
-	m["ratios"] = sr.Ratios.String()
-	m["colors"] = sr.Color
 	if sr.Page != 0 {
 		m["page"] = strconv.Itoa(sr.Page)
 	}
-	m["seed"] = sr.Seed
 
 	for k, v := range m {
 		if v == "" {

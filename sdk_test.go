@@ -140,15 +140,14 @@ func TestJoin(t *testing.T) {
 }
 
 func TestQuery_String(t *testing.T) {
-	q := &Query{
-		fuzzy:    []string{},
-		exclude:  []string{"people", "apple"},
-		must:     []string{},
-		exact:    123,
-		username: "king",
-		typ:      PNG,
-		like:     "fff",
-	}
+	q := &Query{}
+	q.AddFuzzy(" ff abc")
+	q.AddExclude("   def 456")
+	q.AddMust("  zzi  888     ")
+	q.SetUsername("hah   ")
+	q.SetExact(567)
+	q.SetType(PNG)
+	q.SetLike(" wai3")
 	fmt.Printf("%s\n", q)
 }
 
@@ -175,17 +174,38 @@ func TestString(t *testing.T) {
 	fmt.Printf("%s\n", string(rs))
 }
 
+func TestSearchReq_Map(t *testing.T) {
+	s := &SearchReq{
+		Query:       Query{},
+		Category:    People,
+		AIArt:       true,
+		Purity:      SFW,
+		Sorting:     Hot,
+		Order:       Desc,
+		TopRange:    D1,
+		Resolutions: Resolutions{},
+		Ratios:      Ratios{},
+		Color:       C_66cccc,
+		Page:        1,
+		Seed:        "ddd",
+	}
+	s.Query.AddFuzzy("abc def")
+	s.Query.AddExclude("123 456")
+	s.Query.AddMust("789 xyz")
+
+	for k, v := range s.Map() {
+		fmt.Printf("k: %s, v: %s\n", k, v)
+	}
+}
+
 func TestClient_Search(t *testing.T) {
 	r := &SearchReq{
-		Query: Query{
-			fuzzy:    []string{},
-			exclude:  []string{},
-			must:     []string{"apple", "people"},
-			exact:    0,
-			username: "",
-			typ:      "",
-			like:     "",
-		},
+		Category: People | Anime | General,
+		AIArt:    true,
+		Purity:   SFW,
+		Sorting:  Views,
+		Order:    Desc,
+		Page:     1,
 	}
 	fmt.Printf("req: %v\n", r.Map())
 	rsp, err := client.Search(context.Background(), r)
@@ -196,4 +216,20 @@ func TestClient_Search(t *testing.T) {
 		fmt.Printf("%+v\n", v)
 	}
 	fmt.Printf("meta: %+v\n", rsp.Meta)
+
+	fmt.Printf("--------------\n")
 }
+
+func TestJoinEmptySlice(t *testing.T) {
+	ss := []string{}
+	fmt.Printf("[%v]\n", strings.Join(ss, ";"))
+	q := &Query{}
+	fmt.Printf("[%s]\n", q)
+}
+
+/*
+	页数和总偏移的关系
+	(pageID - 1) * pageSize + index = x
+	pageID =( x - x%pageSize + pageSize)/ pageSize
+	index = x%pageSize
+*/
