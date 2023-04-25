@@ -220,6 +220,13 @@ func TestClient_Search(t *testing.T) {
 	fmt.Printf("--------------\n")
 }
 
+func TestJoinEmptySlice(t *testing.T) {
+	ss := []string{}
+	fmt.Printf("[%v]\n", strings.Join(ss, ";"))
+	q := &Query{}
+	fmt.Printf("[%s]\n", q)
+}
+
 /*
 	页数和总偏移的关系
 	(pageID - 1) * pageSize + index = x

@@ -323,10 +323,7 @@ func (q *Query) String() (result string) {
 	if q.like != "" {
 		s = append(s, q.like)
 	}
-
-	if len(s) != 0 {
-		result = strings.Join(s, " ")
-	}
+	result = strings.Join(s, " ")
 	return
 }
 
