@@ -3,7 +3,6 @@ package wallhaven_sdk_go
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"os"
 	"reflect"
 	"strings"
@@ -204,9 +203,8 @@ func TestClient_Search(t *testing.T) {
 		Category: People | Anime | General,
 		AIArt:    true,
 		Purity:   SFW,
-		Sorting:  TopList,
+		Sorting:  Views,
 		Order:    Desc,
-		TopRange: M1,
 		Page:     1,
 	}
 	fmt.Printf("req: %v\n", r.Map())
@@ -220,41 +218,6 @@ func TestClient_Search(t *testing.T) {
 	fmt.Printf("meta: %+v\n", rsp.Meta)
 
 	fmt.Printf("--------------\n")
-
-	randTotal := rand.Intn(rsp.Meta.Total) + 1
-
-	r = &SearchReq{
-		Category: People | Anime | General,
-		Purity:   SFW,
-		Sorting:  TopList,
-		Order:    Desc,
-		TopRange: M1,
-		Page:     randTotal/24 + 1,
-	}
-	rsp, err = client.Search(context.Background(), r)
-	if err != nil {
-		t.Fatalf("%s\n", err)
-	}
-	fmt.Printf("a wallpaper: %+v\n", rsp.Wallpapers[randTotal%24-1])
-	fmt.Printf("meta: %+v\n", rsp.Meta)
-	fmt.Printf("======================\n")
-
-	randTotal = rand.Intn(rsp.Meta.Total) + 1
-
-	r = &SearchReq{
-		Category: People | Anime | General,
-		Purity:   SFW,
-		Sorting:  TopList,
-		Order:    Desc,
-		TopRange: M1,
-		Page:     randTotal/24 + 1,
-	}
-	rsp, err = client.Search(context.Background(), r)
-	if err != nil {
-		t.Fatalf("%s\n", err)
-	}
-	fmt.Printf("a wallpaper: %+v\n", rsp.Wallpapers[randTotal%24-1])
-	fmt.Printf("meta: %+v\n", rsp.Meta)
 }
 
 /*
